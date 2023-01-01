@@ -1,5 +1,5 @@
 const { Sequelize } = require('sequelize');
-const sequelize = require('sequelize');
+const { PGDATABASE, PGUSER, PGPASSWORD, PGHOST, PGPORT } = process.env;
 
 const setupDatabase = () => {
     const connection = new Sequelize(PGDATABASE, PGUSER, PGPASSWORD, {
