@@ -1,18 +1,22 @@
-const { Sequelize } = require('sequelize');
+const Sequelize = require('sequelize');
+const ReaderModel = require('./reader');
+
 const { PGDATABASE, PGUSER, PGPASSWORD, PGHOST, PGPORT } = process.env;
 
 const setupDatabase = () => {
-    const connection = new Sequelize(PGDATABASE, PGUSER, PGPASSWORD, {
-        host: PGHOST,
-        port: PGPORT,
-        dialect: "postgres",
-        logging: false
-    });
+  const connection = new Sequelize(PGDATABASE, PGUSER, PGPASSWORD, {
+    host: PGHOST,
+    port: PGPORT,
+    dialect: 'postgres',
+    logging: false,
+  });
 
-    connection.sync({alter: true})
+  const Reader = ReaderModel(connection, Sequelize);
 
-    return {};
+  connection.sync({ alter: true });
+  return {
+    Reader
+  };
+};
 
-}
-
-module.exports = setupDatabase()
+module.exports = setupDatabase();
