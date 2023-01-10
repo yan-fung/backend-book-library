@@ -27,10 +27,23 @@ describe('/readers', () => {
         expect(newReaderRecord.name).to.equal('Elizabeth Bennet');
         expect(newReaderRecord.email).to.equal('future_ms_darcy@gmail.com');
         expect(newReaderRecord.password).to.equal('rainbow123')
+        });
+        
+        it('returns a 400 and validation error message if it does not pass the validation', async () => {
+            const response = await request(app).post('/readers').send({
+                name: '',
+                email: '',
+                password: '123',
+            });
+
+            expect(response.status).to.equal(400);
+            expect(response.body.error[0]).to.equal("Please enter your name.");
+            expect(response.body.error[1]).to.equal("Validation isEmail on email failed");
+            expect(response.body.error[2]).to.equal("Password must have at least 8 characters, please re-enter.");
+        })
       });
     });
-  });
-});
+})
 
 describe('with records in the database', () => {
     beforeEach(async () => {

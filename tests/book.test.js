@@ -30,6 +30,17 @@ describe('/books', () => {
                 expect(newBookRecord.genre).to.equal('Autobiography');
                 expect(newBookRecord.ISBN).to.equal('9781473695993');
             });
+
+            it('return 400 and validation error message if it does not pass the validation', async () => {
+                const response = await request(app).post('/books').send({
+                    title: '',
+                    author: ''
+                });
+
+                expect(response.status).to.equal(400);
+                expect(response.body.error[0]).to.equal('Please enter the book title.');
+                expect(response.body.error[1]).to.equal('Please enter the author name.');
+            })
         });
     });
 });
