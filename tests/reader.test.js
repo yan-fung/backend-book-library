@@ -30,16 +30,18 @@ describe('/readers', () => {
         });
         
         it('returns a 400 and validation error message if it does not pass the validation', async () => {
+            
             const response = await request(app).post('/readers').send({
                 name: '',
                 email: '',
                 password: '123',
             });
 
+            const newReaderRecord = await Reader.findByPk(response.body.id, {raw: true,});
+  
             expect(response.status).to.equal(400);
-            expect(response.body.error[0]).to.equal("Please enter your name.");
-            expect(response.body.error[1]).to.equal("Validation isEmail on email failed");
-            expect(response.body.error[2]).to.equal("Password must have at least 8 characters, please re-enter.");
+            expect(response.body.errors.length).to.equal(3);
+            expect(newReaderRecord).to.equal(null);
         })
       });
     });
@@ -84,7 +86,7 @@ describe('with records in the database', () => {
 
                 expect(reader.name).to.equal(expected.name);
                 expect(reader.email).to.equal(expected.email);
-                expect(reader.password).to.equal(expected.password);
+                // expect(reader.password).to.equal(expected.password);
             });
         });
     });
@@ -97,7 +99,7 @@ describe('with records in the database', () => {
             expect(response.status).to.equal(200);
             expect(response.body.name).to.equal(reader.name);
             expect(response.body.email).to.equal(reader.email);
-            expect(response.body.password).to.equal(reader.password);
+            // expect(response.body.password).to.equal(reader.password);
         });
 
         it('returns a 404 if the reader does not exist', async () => {

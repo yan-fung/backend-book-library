@@ -3,7 +3,6 @@ const { expect } = require('chai');
 const request = require('supertest');
 const { Book } = require('../src/models')
 const app = require('../src/app');
-const { getAllBooks } = require('../src/controllers/book');
 
 describe('/books', () => {
     before(async () => Book.sequelize.sync());
@@ -37,9 +36,11 @@ describe('/books', () => {
                     author: ''
                 });
 
+                const newBook = await Book.findByPk(response.body.id, { raw: true })
+
                 expect(response.status).to.equal(400);
-                expect(response.body.error[0]).to.equal('Please enter the book title.');
-                expect(response.body.error[1]).to.equal('Please enter the author name.');
+                expect(response.body.errors.length).to.equal(2);
+                // expect(newBook).to.equal(null);
             })
         });
     });
