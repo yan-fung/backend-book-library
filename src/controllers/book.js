@@ -1,63 +1,25 @@
-const { Book } = require("../models")
+const {
+    getAllItems,
+    createItem,
+    updateItem,
+    getItemById,
+    deleteItem,
+} = require('./helpers');
 
-exports.createBook = async (req, res) => {
-    try {
-        const newBook = await Book.create(req.body);
-        res.status(201).json(newBook)
-    } catch (err) {
-        res.status(400).json({
-            error: err.errors.map(e => e.message)
-        });
-    }
-};
+const createBook = (req, res) => createItem(res, 'book', req.body)
 
-exports.getAllBooks = async (_req, res) => {
-    const book = await Book.findAll();
-    res.status(200).json(book);
-};
+const getAllBooks = (_req, res) => getAllItems(res, 'book');
 
-exports.getBooksbyId = async (req, res) => {
-    try {
-        const bookId = req.params.id;
-        const book = await Book.findByPk(bookId);
-    
-        if (!book) {
-            res.status(404).json({ error: 'The book could not be found.' })
-        }
-        res.status(200).json(book);
-    } catch (err) {
-        res.status(500).json(err.message)
-    }
-};
+const getBooksbyId = (req, res) => getItemById(res, 'book', req.params.id)
 
-exports.updateBookById = async (req, res) => {
-    try {
-        const bookId = req.params.id;
-        const updateData = req.body;
-        const book = await Book.findByPk(bookId);
-        const updatedData = await Book.update(updateData, { where: { id: bookId} });
+const updateBookById = (req, res) => updateItem(res, 'book', req.body, req.params.id);
 
-        if (!book) {
-            res.status(404).json({ error: 'The book could not be found.' })
-        }
-        res.status(200).json(updatedData);
-    } catch (err) {
-        res.status(500).json(err.message )
-    }
-}
+const deleteBookById = (req, res) => deleteItem(res, 'book', req.params.id);
 
-exports.deleteBookById = async (req, res) => {
-    try {
-        const bookId = req.params.id;
-        const book = await Book.findByPk(bookId);
-        const deletedBook = await Book.destroy({ where: { id: bookId} });
-
-        if (!book) {
-            res.status(404).json({ error: 'The book could not be found.' })
-        }
-        res.status(204).json(deletedBook);
-
-    } catch (err) {
-        res.status(500).json(err.message);
-    }
+module.exports = {
+    createBook,
+    getAllBooks,
+    getBooksbyId,
+    updateBookById,
+    deleteBookById
 }
