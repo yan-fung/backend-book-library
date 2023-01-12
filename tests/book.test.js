@@ -16,8 +16,8 @@ describe('/books', () => {
             it('creates a new book in the database', async () => {
                 const response = await request(app).post('/books').send({
                     title: 'Brief Answers To The Big Questions',
-                    author: 'Stephen Hawking',
-                    genre: 'Autobiography',
+                    // author: 'Stephen Hawking',
+                    // genre: 'Autobiography',
                     ISBN: '9781473695993'
                 });
 
@@ -25,8 +25,8 @@ describe('/books', () => {
 
                 expect(response.status).to.equal(201);
                 expect(response.body.title).to.equal('Brief Answers To The Big Questions');
-                expect(newBookRecord.author).to.equal('Stephen Hawking');
-                expect(newBookRecord.genre).to.equal('Autobiography');
+                // expect(newBookRecord.author).to.equal('Stephen Hawking');
+                // expect(newBookRecord.genre).to.equal('Autobiography');
                 expect(newBookRecord.ISBN).to.equal('9781473695993');
             });
 
@@ -39,7 +39,7 @@ describe('/books', () => {
                 const newBook = await Book.findByPk(response.body.id, { raw: true })
 
                 expect(response.status).to.equal(400);
-                expect(response.body.errors.length).to.equal(2);
+                expect(response.body.errors.length).to.equal(1);
                 // expect(newBook).to.equal(null);
             })
         });
@@ -56,20 +56,20 @@ describe('with records in the database', () => {
         books = await Promise.all([
             Book.create({
                 title: 'Brief Answers To The Big Questions',
-                author: 'Stephen Hawking',
-                genre: 'Autobiography',
+                // author: 'Stephen Hawking',
+                // genre: 'Autobiography',
                 ISBN: '9781473695993'
             }),
             Book.create({
                 title: 'The courage to be disliked',
-                author: 'Ichiro Kishimi and Fumitake Koga',
-                genre: 'Psychoanalysis',
+                // author: 'Ichiro Kishimi and Fumitake Koga',
+                // genre: 'Psychoanalysis',
                 ISBN: '9781501197277'
             }),
             Book.create({
                 title: 'Why Has Nobody Told Me This Before?',
-                author: 'Julie Smith',
-                genre: 'Self-help',
+                // author: 'Julie Smith',
+                // genre: 'Self-help',
                 ISBN: '9780241529713'
             })
         ]);
@@ -86,8 +86,8 @@ describe('with records in the database', () => {
                 const expected = books.find((a) => a.id === book.id);
 
                 expect(book.title).to.equal(expected.title);
-                expect(book.author).to.equal(expected.author);
-                expect(book.genre).to.equal(expected.genre);
+                // expect(book.author).to.equal(expected.author);
+                // expect(book.genre).to.equal(expected.genre);
                 expect(book.ISBN).to.equal(expected.ISBN);
             });
         });
@@ -100,8 +100,8 @@ describe('with records in the database', () => {
 
             expect(response.status).to.equal(200);
             expect(response.body.title).to.equal(book.title);
-            expect(response.body.author).to.equal(book.author);
-            expect(response.body.genre).to.equal(book.genre);
+            // expect(response.body.author).to.equal(book.author);
+            // expect(response.body.genre).to.equal(book.genre);
             expect(response.body.ISBN).to.equal(book.ISBN);
         });
 

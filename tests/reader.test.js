@@ -86,7 +86,7 @@ describe('with records in the database', () => {
 
                 expect(reader.name).to.equal(expected.name);
                 expect(reader.email).to.equal(expected.email);
-                // expect(reader.password).to.equal(expected.password);
+                expect(reader.password).to.equal(undefined);
             });
         });
     });
