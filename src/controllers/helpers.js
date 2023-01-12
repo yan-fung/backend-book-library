@@ -1,4 +1,4 @@
-const { Book, Reader, Genre } = require('../models');
+const { Book, Reader, Author, Genre } = require('../models')
 
 const get404Error = (model) => ({ error: `The ${model} could not be found.` });
 
@@ -7,18 +7,19 @@ const getModel = (model) => {
     book: Book,
     reader: Reader,
     genre: Genre,
+    author: Author,
   };
 
   return models[model];
 };
 
-const getOptions = (model) => {
-  if (model === 'book') return { include: Genre };
+// const getOptions = (model) => {
+//   if (model === 'book') return { include: Genre };
 
-  if (model === 'genre') return { include: Book };
+//   if (model === 'genre') return { include: Book };
 
-  return {};
-};
+//   return {};
+// };
 
 const removePassword = (obj) => {
   if (obj.hasOwnProperty('password')) {
@@ -31,13 +32,12 @@ const removePassword = (obj) => {
 const getAllItems = async (res, model) => {
   const Model = getModel(model);
 
-  const options = getOptions(model);
+  // const options = getOptions(model);
 
-  const items = await Model.findAll({...options})
-  console.log(items)
+  const items = await Model.findAll() //Model.findAll({...options})
     
   const itemsWithoutPassword = items.map((item) => {
-    return removePassword(item.get());
+    return removePassword(item.dataValues);
   });
 
   res.status(200).json(itemsWithoutPassword);
@@ -48,7 +48,7 @@ const createItem = async (res, model, item) => {
 
   try {
     const newItem = await Model.create(item);
-    const itemWithoutPassword = removePassword(newItem.get());
+    const itemWithoutPassword = removePassword(newItem.dataValues);
 
     res.status(201).json(itemWithoutPassword);
   } catch (error) {
@@ -67,7 +67,7 @@ const updateItem = async (res, model, item, id) => {
     res.status(404).json(get404Error(model));
   } else {
     const updatedItem = await Model.findByPk(id);
-    const itemWithoutPassword = removePassword(updatedItem.get());
+    const itemWithoutPassword = removePassword(updatedItem.dataValues);
     res.status(200).json(itemWithoutPassword);
   }
 };
@@ -75,9 +75,9 @@ const updateItem = async (res, model, item, id) => {
 const getItemById = async (res, model, id) => {
   const Model = getModel(model);
 
-  const options = getOptions(model);
+  // const options = getOptions(model);
 
-  const item = await Model.findByPk(id, { ...options });
+  const item = await Model.findByPk(id);
 
   if (!item) {
     res.status(404).json(get404Error(model));
