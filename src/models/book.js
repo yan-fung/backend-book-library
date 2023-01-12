@@ -11,7 +11,7 @@ module.exports = (connection, DataTypes) => {
                 notEmpty: {
                     args: [true],
                     msg: 'The book title cannot be empty.'
-                }
+                },
             }
         },
         ISBN: {
