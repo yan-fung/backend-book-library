@@ -13,13 +13,13 @@ const getModel = (model) => {
   return models[model];
 };
 
-// const getOptions = (model) => {
-//   if (model === 'book') return { include: Genre };
+const getOptions = (model) => {
+  if (model === 'book') return { include: Genre };
 
-//   if (model === 'genre') return { include: Book };
+  if (model === 'genre') return { include: Book };
 
-//   return {};
-// };
+  return {};
+};
 
 const removePassword = (obj) => {
   if (obj.hasOwnProperty('password')) {
@@ -32,9 +32,9 @@ const removePassword = (obj) => {
 const getAllItems = async (res, model) => {
   const Model = getModel(model);
 
-  // const options = getOptions(model);
+  const options = getOptions(model);
 
-  const items = await Model.findAll() //Model.findAll({...options})
+  const items = await Model.findAll({...options})
     
   const itemsWithoutPassword = items.map((item) => {
     return removePassword(item.dataValues);
@@ -75,9 +75,10 @@ const updateItem = async (res, model, item, id) => {
 const getItemById = async (res, model, id) => {
   const Model = getModel(model);
 
-  // const options = getOptions(model);
+  const options = getOptions(model);
 
-  const item = await Model.findByPk(id);
+  const item = await Model.findByPk(id, { includes: [{ model: Genre }] });
+  console.log(item)
 
   if (!item) {
     res.status(404).json(get404Error(model));

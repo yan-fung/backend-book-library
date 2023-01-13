@@ -12,6 +12,7 @@ const setupDatabase = () => {
     port: PGPORT,
     dialect: 'postgres',
     logging: false,
+    define: { timestamps: false },
   });
 
   const Reader = ReaderModel(connection, Sequelize);

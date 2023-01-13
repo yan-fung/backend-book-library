@@ -1,23 +1,25 @@
-const { DataTypes } = require("sequelize");
-
 module.exports = (connection, DataTypes) => {
     const schema = {
         genre: {
             type: DataTypes.STRING,
             allowNull: false,
-            uniqure: true,
+            unique: {
+                args: [true],
+                msg: "genre already exists"
+            }, 
             validate: {
                 notNull: {
                     args: [true],
-                    msg: 'Please enter the genre for the book.'
+                    msg: "genre is required"
                 },
                 notEmpty: {
                     args: [true],
-                    msg: 'The genre cannot be empty.'
+                    msg: "genre cannot be empty",
                 },
             },
         },
     };
+
     const GenreModel = connection.define('Genre', schema);
     return GenreModel;
-}
+};
