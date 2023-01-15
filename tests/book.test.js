@@ -1,24 +1,32 @@
 /* tests/book.test.js */
 const { expect } = require('chai');
 const request = require('supertest');
-const { Book } = require('../src/models');
+const { Book, Genre, Author } = require('../src/models');
 const app = require('../src/app');
 
 describe('/books', () => {
+  let testGenre;
+  let testAuthor;
+
   before(async () => Book.sequelize.sync());
 
-  beforeEach(async () => {
-    await Book.destroy({ where: {} });
-  });
-
   describe('with no records in the database', () => {
+
+    beforeEach(async () => {
+      await Book.destroy({ where: {} });
+      await Genre.destroy({ where: {} });
+      await Author.destroy({ where: {} });
+      testGenre = await Genre.create({ genre: 'Autobiography' });
+      testAuthor = await Author.create({ author: 'Stephen Hawking' });
+    });
+
     describe('POST /books', () => {
       it('creates a new book in the database', async () => {
         const response = await request(app).post('/books').send({
           title: 'Brief Answers To The Big Questions',
-          // author: 'Stephen Hawking',
-          // genre: 'Autobiography',
           ISBN: '9781473695993',
+          GenreId: testGenre.id,
+          AuthorId: testAuthor.id
         });
 
         const newBookRecord = await Book.findByPk(response.body.id, {
@@ -43,7 +51,7 @@ describe('/books', () => {
         const newBook = await Book.findByPk(response.body.id, { raw: true });
 
         expect(response.status).to.equal(400);
-        expect(response.body.errors.length).to.equal(1);
+        expect(response.body.errors.length).to.equal(3);
         // expect(newBook).to.equal(null);
       });
     });
@@ -51,31 +59,38 @@ describe('/books', () => {
 });
 
 describe('with records in the database', () => {
+  let testBooks;
+  let testGenres;
+  let testAuthors;
+
   beforeEach(async () => {
     await Book.destroy({ where: {} });
-  });
+    await Genre.destroy({ where: {} });
+    await Author.destroy({ where: {} });
 
-  let books;
-  beforeEach(async () => {
-    books = await Promise.all([
+    testGenres = await Promise.all([
+      Genre.create({ genre: 'Autobiography' }),
+      Genre.create({ genre: 'Psychoanalysis' })
+    ]);
+
+    testAuthors = await Promise.all([
+      Author.create({ author: 'Stephen Hawking' }),
+      Author.create({ author: 'Ichiro Kishimi and Fumitake Koga' })
+    ]);
+
+    testBooks = await Promise.all([
       Book.create({
         title: 'Brief Answers To The Big Questions',
-        // author: 'Stephen Hawking',
-        // genre: 'Autobiography',
         ISBN: '9781473695993',
+        GenreId: testGenres[0].id,
+        AuthorId: testAuthors[0].id
       }),
       Book.create({
         title: 'The courage to be disliked',
-        // author: 'Ichiro Kishimi and Fumitake Koga',
-        // genre: 'Psychoanalysis',
         ISBN: '9781501197277',
-      }),
-      Book.create({
-        title: 'Why Has Nobody Told Me This Before?',
-        // author: 'Julie Smith',
-        // genre: 'Self-help',
-        ISBN: '9780241529713',
-      }),
+        GenreId: testGenres[1].id,
+        AuthorId: testAuthors[1].id
+      })
     ]);
   });
 
@@ -84,10 +99,10 @@ describe('with records in the database', () => {
       const response = await request(app).get('/books');
 
       expect(response.status).to.equal(200);
-      expect(response.body.length).to.equal(3);
+      expect(response.body.length).to.equal(2);
 
       response.body.forEach((book) => {
-        const expected = books.find((a) => a.id === book.id);
+        const expected = testBooks.find((a) => a.id === book.id);
 
         expect(book.title).to.equal(expected.title);
         // expect(book.author).to.equal(expected.author);
@@ -99,7 +114,7 @@ describe('with records in the database', () => {
 
   describe('gets books record by id', () => {
     it('gets books record by id', async () => {
-      const book = books[0];
+      const book = testBooks[0];
       const response = await request(app).get(`/books/${book.id}`);
 
       expect(response.status).to.equal(200);
@@ -119,7 +134,7 @@ describe('with records in the database', () => {
 
   describe('PATCH /books/:id', () => {
     it('updates books ISBN by id', async () => {
-      const book = books[0];
+      const book = testBooks[0];
       const response = await request(app)
         .patch(`/books/${book.id}`)
         .send({ ISBN: '9837403842' });
@@ -142,7 +157,7 @@ describe('with records in the database', () => {
 
   describe('DELETE /books/:id', () => {
     it('deletes book record by id', async () => {
-      const book = books[0];
+      const book = testBooks[0];
       const response = await request(app).delete(`/books/${book.id}`);
 
       const deletedBook = await Book.findByPk(book.id, { raw: true });
