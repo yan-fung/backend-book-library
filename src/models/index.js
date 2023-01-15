@@ -2,7 +2,7 @@ const Sequelize = require('sequelize');
 const ReaderModel = require('./reader');
 const BookModel = require('./book');
 const AuthorModel = require('./author');
-const GenreModel = require('./genre')
+const GenreModel = require('./genre');
 
 const { PGDATABASE, PGUSER, PGPASSWORD, PGHOST, PGPORT } = process.env;
 
@@ -23,24 +23,23 @@ const setupDatabase = () => {
   Reader.hasMany(Book);
   Genre.hasMany(Book, {
     foreignKey: {
-      allowNull: false
-    }
+      allowNull: false,
+    },
   });
   Book.belongsTo(Genre);
   Author.hasMany(Book, {
     foreignKey: {
-      allowNull: false
-    }
+      allowNull: false,
+    },
   });
   Book.belongsTo(Author);
-
 
   connection.sync({ alter: true });
   return {
     Reader,
     Book,
     Author,
-    Genre
+    Genre,
   };
 };
 

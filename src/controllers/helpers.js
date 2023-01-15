@@ -1,4 +1,4 @@
-const { Book, Reader, Author, Genre } = require('../models')
+const { Book, Reader, Author, Genre } = require('../models');
 
 const get404Error = (model) => ({ error: `The ${model} could not be found.` });
 
@@ -16,7 +16,8 @@ const getModel = (model) => {
 const getOptions = (model) => {
   if (model === 'book') return { include: [Genre, Author] };
 
-  if (model === 'genre' || model === 'author' || model === 'reader') return { include: Book };
+  if (model === 'genre' || model === 'author' || model === 'reader')
+    return { include: Book };
 
   // if (model === 'author') return { include: Book };
 
@@ -36,8 +37,8 @@ const getAllItems = async (res, model) => {
 
   const options = getOptions(model);
 
-  const items = await Model.findAll({...options})
-    
+  const items = await Model.findAll({ ...options });
+
   const itemsWithoutPassword = items.map((item) => {
     return removePassword(item.dataValues);
   });
@@ -63,7 +64,7 @@ const createItem = async (res, model, item) => {
 const updateItem = async (res, model, item, id) => {
   const Model = getModel(model);
 
-  const [ itemsUpdated ]= await Model.update(item, { where: { id } });
+  const [itemsUpdated] = await Model.update(item, { where: { id } });
 
   if (!itemsUpdated) {
     res.status(404).json(get404Error(model));
@@ -79,8 +80,8 @@ const getItemById = async (res, model, id) => {
 
   const options = getOptions(model);
 
-  const item = await Model.findByPk(id, { includes: [{ model: Genre }] });
-  console.log(item)
+  const item = await Model.findByPk(id, { ...options });
+  console.log(item);
 
   if (!item) {
     res.status(404).json(get404Error(model));
